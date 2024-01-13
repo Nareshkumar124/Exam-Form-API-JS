@@ -40,8 +40,16 @@ function validatePhoneNumber(phoneNumber) {
     return isMatch;
 }
 
+function isEmailValid(email) {
+    // Basic pattern for email validation
+    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  
+    // Check if the email matches the pattern
+    return emailRegex.test(email);
+  }
 export {
     validateAUID,
     validatePhoneNumber,
     isStrongPassword,
+    isEmailValid,
 }

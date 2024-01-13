@@ -6,6 +6,7 @@ const fromDataSchema = new mongoose.Schema(
             type: String,
             required: true,
             index: true,
+            unique:true,
         },
         fees: {
             type: Number,
@@ -39,12 +40,9 @@ const fromDataSchema = new mongoose.Schema(
             default:true
         },
 
-        subjectCode: [
-            {
-                //reapper subject code if not regulare
-                type: String,
-            },
-        ],
+        subjectCode:{
+            type: String,
+        },
     },
     {
         timestamps: true,

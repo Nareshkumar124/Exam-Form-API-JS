@@ -3,7 +3,7 @@ import {ApiError} from '../utils/apiError.js'
 import {ApiResponse} from '../utils/apiResponse.js'
 import {uploadOnCloud} from '../utils/cloudinary.js'
 import {User} from '../models/user.models.js'
-import {validateAUID,validatePhoneNumber,isStrongPassword} from '../utils/check.js'
+import {validateAUID,validatePhoneNumber,isStrongPassword, isEmailValid} from '../utils/check.js'
 
 const generateAcessAndRefereshTokens = async (user) => {
     try {
@@ -20,10 +20,10 @@ const generateAcessAndRefereshTokens = async (user) => {
 
 
 const register=asyncHandler(async (req,res)=>{
-    const {auid,fullName,password,phoneNumber,programId}=req.body
+    const {auid,fullName,password,phoneNumber,programId,email,fatherName,motherName,address}=req.body
 
-    if([auid,fullName,password,phoneNumber,programId].some((val)=>(val?.trim()==="" || val===undefined))){
-        throw new ApiError(400,"auid,fullName,password,phoneNumber,programId is requried.")
+    if([auid,fullName,password,phoneNumber,programId,email,fatherName,motherName,address].some((val)=>(val?.trim()==="" || val===undefined))){
+        throw new ApiError(400,"auid,fullName,password,phoneNumber,programId,email,fatherName,motherName,address is requried.")
     }
 
     //Checks....
@@ -35,6 +35,9 @@ const register=asyncHandler(async (req,res)=>{
     }
     if(!validatePhoneNumber(phoneNumber)){
         throw new ApiError(400,"Phone number is not valid.")
+    }
+    if(!isEmailValid(email)){
+        throw new ApiError(400,"Email is not valid.")
     }
 
     // check user already or not
@@ -52,7 +55,7 @@ const register=asyncHandler(async (req,res)=>{
     }
 
     if(!avatarCloud){
-        throw ApiError(500,"Failed to upload your file.")
+        throw new ApiError(500,"Failed to upload your file.")
     }
 
     // create user and save in database
@@ -64,9 +67,10 @@ const register=asyncHandler(async (req,res)=>{
         phoneNumber:phoneNumber,
         avatar:avatarCloud.url,
         programId:programId,
-        email:req.body.email || "",
-        fatherName:req.body.fatherName || "",
-        motherName:req.body.motherName || "",
+        email:email,
+        fatherName:fatherName,
+        motherName:motherName,
+        address:address,
     })
 
     if(user){
@@ -163,10 +167,58 @@ const getUser=asyncHandler(async (req,res)=>{
         )
     )
 })
+
+const updateUser=asyncHandler(async(req,res)=>{
+    const {fullName,phoneNumber,email,fatherName,motherName,address}=req.body;
+    if([fullName,phoneNumber,email,fatherName,motherName,address].some((val)=>(val?.trim()==="" || val===undefined))){
+        throw new ApiError(400,"fullName,phoneNumber,email,fatherName,motherName,address is requried.")
+    }
+
+    //Checks....
+    if(!validatePhoneNumber(phoneNumber)){
+        throw new ApiError(400,"Phone number is not valid.")
+    }
+    if(!isEmailValid(email)){
+        throw new ApiError(400,"Email is not valid.")
+    }
+
+    const user=req.user;
+    user.fullName=fullName;
+    user.phoneNumber=phoneNumber;
+    user.eamil=email;
+    user.fatherName=fatherName;
+    user.motherName=motherName,
+    user.address=address;
+
+    const updatedUser=await user.save()
+
+    res.status(200).json(
+        new ApiResponse(
+            200,
+            updatedUser,
+            "User is UpDate."
+        )
+    )
+
+
+})
+
+const updateAvatar=asyncHandler(async(req,res)=>{
+
+})
+
+const updatePassword=asyncHandler(async(req,res)=>{
+
+})
+
+
 export {
     register,
     loginUser,
     logoutUser,
     getUser,
+    updateUser,
+    updateAvatar,
+    updatePassword,
 }
 

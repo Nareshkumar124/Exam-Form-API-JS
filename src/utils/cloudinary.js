@@ -20,6 +20,7 @@ const uploadOnCloud = async (localFilePath) => {
         fs.unlinkSync(localFilePath)
         return response;
     } catch (error) {
+        console.log(error)
         fs.unlinkSync(localFilePath); //remove file from system when upload fail
         return null;
     }

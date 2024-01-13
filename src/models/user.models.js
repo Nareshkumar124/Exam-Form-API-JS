@@ -29,27 +29,32 @@ const userSchema=new mongoose.Schema(
 
         email:{
             type:String,
+            required:true,
         },
 
         avatar:{
             type:String,
-            required:true
+            required:true,
         },
 
         fatherName:{
             type:String,
+            required:true,
         },
 
         motherName:{
             type:String,
+            required:true,
         },
 
         address:{
             type:String,
+            required:true,
         },
         programId:{
             type:mongoose.Schema.Types.ObjectId,
-            ref:"Program"
+            ref:"Program",
+            required:true
         },
         refreshToken: {
             type: String,

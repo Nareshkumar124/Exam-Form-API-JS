@@ -6,7 +6,7 @@ const examinationFormSchema=new mongoose.Schema(
             type:mongoose.Schema.Types.ObjectId,
             ref:"User"
         },
-        froms:[
+        forms:[
             {
                 type:mongoose.Schema.Types.ObjectId,
                 ref:"FormData"
