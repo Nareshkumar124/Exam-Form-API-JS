@@ -68,9 +68,6 @@ const getAllForms=asyncHandler(async (req,res)=>{
     //TODO : Not SEND FULL DATA send only data that(Your Choice)
 })
 
-const formIsLive=asyncHandler(async(req,res)=>{
-    //IN User modal check from is Live Or Not
-})
 
 const formBasedOnId=asyncHandler(async(req,res)=>{
 
@@ -79,4 +76,4 @@ const formBasedOnId=asyncHandler(async(req,res)=>{
 //Api For form edit..
 //API From APROVEL...
 
-export { submitFromData,getAllForms,formIsLive };
+export { submitFromData,getAllForms};

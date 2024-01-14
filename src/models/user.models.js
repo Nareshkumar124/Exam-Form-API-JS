@@ -56,6 +56,11 @@ const userSchema=new mongoose.Schema(
             ref:"Program",
             required:true
         },
+        formLive:{
+            type:Boolean,
+            default:false,
+            required:true,
+        },
         refreshToken: {
             type: String,
         },
