@@ -24,17 +24,32 @@ const generateAcessAndRefereshTokens = async (user) => {
 };
 
 const register = asyncHandler(async (req, res) => {
+
     const {
         auid,
         fullName,
         password,
         phoneNumber,
-        programId,
         email,
         fatherName,
         motherName,
         address,
     } = req.body;
+
+    let userType="S";
+    let programId=undefined;
+    if(!(req.body.role=="A")){
+         //check program id.
+         programId=req.body.programId;
+         if(!programId){
+            throw new ApiError(400,"Program id is requried.")
+         }
+    }else{
+        userType="A"
+    }
+
+    // If user wnat to register a admin.
+    // if user is admin than they able to create admin.
 
     if (
         [
@@ -42,7 +57,6 @@ const register = asyncHandler(async (req, res) => {
             fullName,
             password,
             phoneNumber,
-            programId,
             email,
             fatherName,
             motherName,
@@ -72,6 +86,7 @@ const register = asyncHandler(async (req, res) => {
     // check user already or not
     const existedUser = await User.findOne({ auid: auid });
 
+
     if (existedUser) {
         throw new ApiError(400, "User already exites.");
     }
@@ -100,6 +115,7 @@ const register = asyncHandler(async (req, res) => {
         fatherName: fatherName,
         motherName: motherName,
         address: address,
+        role:userType
     });
 
     if (user) {

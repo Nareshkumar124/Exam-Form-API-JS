@@ -54,12 +54,16 @@ const userSchema=new mongoose.Schema(
         programId:{
             type:mongoose.Schema.Types.ObjectId,
             ref:"Program",
-            required:true
         },
         formLive:{
             type:Boolean,
             default:false,
             required:true,
+        },
+        role:{
+            type:String,
+            enum:["A","S"],
+            default:"S"
         },
         refreshToken: {
             type: String,

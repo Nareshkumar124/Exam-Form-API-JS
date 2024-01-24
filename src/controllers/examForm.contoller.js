@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/apiResponse.js";
 import { Router } from "express";
 import { ExaminationFrom } from "../models/examinationForm.models.js";
 import { FromData } from "../models/formData.models.js";
+import { User } from "../models/user.models.js";
 
 const submitFromData = asyncHandler(async (req, res) => {
     //Collect data from body
@@ -65,12 +66,41 @@ const submitFromData = asyncHandler(async (req, res) => {
 
 
 const getAllForms=asyncHandler(async (req,res)=>{
-    //TODO : Not SEND FULL DATA send only data that(Your Choice)
+    
+    const user=req.user
+
+    //All form from data base
+    const allFroms=await ExaminationFrom.findOne({user:user._id})
+
+    res.status(200).json(
+        new ApiResponse(
+            200,
+            allFroms?.forms || null,
+            "All forms ID."
+            
+        )
+    )
 })
 
 
 const formBasedOnId=asyncHandler(async(req,res)=>{
+    const fromsId=req.params._id;
+    if(!fromsId){
+        throw new ApiError(400,"Froms id is requried.")
+    }
+    const formData=await FromData.findById(fromsId)
 
+    if(!formData){
+        throw new ApiError(400,"From id is not valid.pleace enter a valid form id.")
+    }
+
+    res.status(200).json(
+        new ApiResponse(
+            200,
+            formData,
+            "Your form Data"
+        )
+    )
 })
 
 //Api For form edit..
