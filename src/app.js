@@ -38,10 +38,12 @@ import {userRouter} from '../src/routes/user.routes.js'
 import { departmentRouter } from "./routes/department.routes.js";
 import { programRoute } from "./routes/program.routes.js";
 import {examFormRouter} from './routes/examForm.routes.js'
+import { adminRoute } from "./routes/admin.routes.js";
 
 app.use("/api/v1/user",userRouter);
 app.use("/api/v1/department",departmentRouter)
 app.use("/api/v1/program",programRoute)
 app.use("/api/v1/form",examFormRouter)
+app.use("/api/v1/approved",adminRoute);
 export { app };
 
