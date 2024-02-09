@@ -18,7 +18,7 @@ const approvedByAdmin=asyncHandler(async (req,res)=>{
     const formData=await FromData.findById(formId);
 
     if(!formData){
-        throw new ApiError(400,"Form id is invalid");
+        throw new ApiError(500,"Form id is invalid");
     }
 
     if(post=="M"){
@@ -45,6 +45,10 @@ const approvedByAdmin=asyncHandler(async (req,res)=>{
 
 })
 
+
+const formAccordingToClass=asyncHandler(async (req,res)=>{
+    
+})
 export {
     approvedByAdmin,
 }
