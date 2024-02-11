@@ -23,6 +23,7 @@ const generateAcessAndRefereshTokens = async (user) => {
     }
 };
 
+//uunder testing
 const register = asyncHandler(async (req, res) => {
 
     const {
@@ -93,14 +94,13 @@ const register = asyncHandler(async (req, res) => {
 
     let avatarCloud;
     if (req.file) {
-        avatarCloud = await uploadOnCloud(req.file.path);
-    } else {
-        throw new ApiError(400, "Avatar file is requried");
+        avatarCloud = await uploadOnCloud(req.file);
+        if (!avatarCloud) {
+            throw new ApiError(500, "Failed to upload your file.");
+        }
     }
 
-    if (!avatarCloud) {
-        throw new ApiError(500, "Failed to upload your file.");
-    }
+    
 
     // create user and save in database
 
@@ -109,7 +109,7 @@ const register = asyncHandler(async (req, res) => {
         password: password,
         fullName: fullName,
         phoneNumber: phoneNumber,
-        avatar: avatarCloud.url,
+        avatar: avatarCloud?.url,
         programId: programId,
         email: email,
         fatherName: fatherName,

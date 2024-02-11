@@ -20,6 +20,12 @@ const fromDataSchema = new mongoose.Schema(
             type: Boolean,
             required: true,
         },
+
+        prevYearData:{
+            type:mongoose.Schema.Types.ObjectId,
+            ref:"PrevYearData"
+            
+        },
         approvedByMentor: {
             type: Boolean,
             required: true,
