@@ -122,21 +122,22 @@ const getAllForms = asyncHandler(async (req, res) => {
 });
 
 const formBasedOnId = asyncHandler(async (req, res) => {
-    const fromsId = req.params._id;
-    if (!fromsId) {
-        throw new ApiError(400, "Froms id is requried.");
+    const formId = req.params._id; // Corrected variable name to formId
+    if (!formId) {
+        throw new ApiError(400, "Form id is required.");
     }
-    const formData = await FromData.findById(fromsId);
+    const formData = await FormData.findById(formId); // Corrected variable name to FormData
 
     if (!formData) {
         throw new ApiError(
-            400,
-            "From id is not valid.pleace enter a valid form id."
+            404,
+            "Form not found. Please enter a valid form id."
         );
     }
 
     res.status(200).json(new ApiResponse(200, formData, "Your form Data"));
 });
+
 
 //Api For form edit..
 //API From APROVEL...
