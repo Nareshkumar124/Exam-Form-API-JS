@@ -3,6 +3,7 @@ import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { uploadOnCloud } from "../utils/cloudinary.js";
 import { User } from "../models/user.models.js";
+import {Types} from 'mongoose';
 import {
     validateAUID,
     validatePhoneNumber,
@@ -197,10 +198,36 @@ const logoutUser = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, null, "User Logout SucessFully"));
 });
 
+
+// Under testing
 const getUser = asyncHandler(async (req, res) => {
     const userId = req.user?._id;
 
-    const user = await User.findById(userId).select("-password -refreshToken");
+    // const user = await User.findById(userId).select("-password -refreshToken");
+
+    const user=await User.aggregate([
+        {
+          $match: {
+            _id: new Types.ObjectId(userId),
+          },
+        },
+        {
+          $lookup: {
+            from: "programs",
+            localField: "programId",
+            foreignField: "_id",
+            as: "course",
+          },
+        },
+        {
+          $lookup: {
+            from: "departments",
+            localField: "course.departmentId",
+            foreignField: "_id",
+            as: "department",
+          },
+        },
+      ])
 
     res.status(200).json(
         new ApiResponse(200, user, "User fetched sucessfully.")
