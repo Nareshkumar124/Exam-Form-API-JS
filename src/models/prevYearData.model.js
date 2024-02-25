@@ -15,7 +15,7 @@ const prevYearDataSchema = new mongoose.Schema(
             required: true,
         },
         auid: {
-            type: [String, "Auid or roll number."],
+            type: String,
             require: true,
         },
         result: {
@@ -27,7 +27,7 @@ const prevYearDataSchema = new mongoose.Schema(
             required: true,
         },
         marksObtained: {
-            type: String,
+            type: Number,
             required: true,
         },
         coursePassed: {
@@ -38,18 +38,15 @@ const prevYearDataSchema = new mongoose.Schema(
         // some questions
 
         qus1: {
-            type: [Boolean, "Have you ever been disqualified."],
+            type: Boolean,
             required: true,
         },
         qus2: {
-            type: [
-                Boolean,
-                "Are you appearing two examination simultaneously.",
-            ],
+            type: Boolean,
             required: true,
         },
         qus3: {
-            type: [Boolean, "Have you appied for re-evalution of lower"],
+            type: Boolean,
             required: true,
         },
     },

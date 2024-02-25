@@ -12,7 +12,7 @@ const asyncHandler= (fn)=> async (req,res,next)=>{
             {
                 statusCode:err.statusCode || 500,
                 data:null,
-                message:err.message,
+                message:err.message || "something went wrong.",
                 success:false,
             }
         )
