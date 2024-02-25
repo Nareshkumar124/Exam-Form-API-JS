@@ -3,7 +3,7 @@ import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { uploadOnCloud } from "../utils/cloudinary.js";
 import { User } from "../models/user.models.js";
-import {Types} from 'mongoose';
+import { Types } from "mongoose";
 import {
     validateAUID,
     validatePhoneNumber,
@@ -26,7 +26,6 @@ const generateAcessAndRefereshTokens = async (user) => {
 
 //uunder testing
 const register = asyncHandler(async (req, res) => {
-
     const {
         auid,
         fullName,
@@ -38,16 +37,16 @@ const register = asyncHandler(async (req, res) => {
         address,
     } = req.body;
 
-    let userType="S";
-    let programId=undefined;
-    if(!(req.body.role=="A")){
-         //check program id.
-         programId=req.body.programId;
-         if(!programId){
-            throw new ApiError(400,"Program id is requried.")
-         }
-    }else{
-        userType="A"
+    let userType = "S";
+    let programId = undefined;
+    if (!(req.body.role == "A")) {
+        //check program id.
+        programId = req.body.programId;
+        if (!programId) {
+            throw new ApiError(400, "Program id is requried.");
+        }
+    } else {
+        userType = "A";
     }
 
     // If user wnat to register a admin.
@@ -88,7 +87,6 @@ const register = asyncHandler(async (req, res) => {
     // check user already or not
     const existedUser = await User.findOne({ auid: auid });
 
-
     if (existedUser) {
         throw new ApiError(400, "User already exites.");
     }
@@ -100,8 +98,6 @@ const register = asyncHandler(async (req, res) => {
             throw new ApiError(500, "Failed to upload your file.");
         }
     }
-
-    
 
     // create user and save in database
 
@@ -116,7 +112,7 @@ const register = asyncHandler(async (req, res) => {
         fatherName: fatherName,
         motherName: motherName,
         address: address,
-        role:userType
+        role: userType,
     });
 
     if (user) {
@@ -198,39 +194,49 @@ const logoutUser = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, null, "User Logout SucessFully"));
 });
 
-
 // Under testing
 const getUser = asyncHandler(async (req, res) => {
     const userId = req.user?._id;
 
     // const user = await User.findById(userId).select("-password -refreshToken");
 
-    const user=await User.aggregate([
+    const user = await User.aggregate([
         {
-          $match: {
-            _id: new Types.ObjectId(userId),
-          },
+            $match: {
+                _id: new Types.ObjectId(userId),
+            },
         },
         {
-          $lookup: {
-            from: "programs",
-            localField: "programId",
-            foreignField: "_id",
-            as: "course",
-          },
+            $lookup: {
+                from: "programs",
+                localField: "programId",
+                foreignField: "_id",
+                as: "course",
+            },
         },
         {
-          $lookup: {
-            from: "departments",
-            localField: "course.departmentId",
-            foreignField: "_id",
-            as: "department",
-          },
+            $lookup: {
+                from: "departments",
+                localField: "course.departmentId",
+                foreignField: "_id",
+                as: "department",
+            },
         },
-      ])
+
+        {
+            $addFields: {
+                "course": {
+                    $arrayElemAt: ["$course", 0],
+                },
+                "department": {
+                    $arrayElemAt: ["$department", 0],
+                },
+            },
+        },
+    ]);
 
     res.status(200).json(
-        new ApiResponse(200, user, "User fetched sucessfully.")
+        new ApiResponse(200, user[0], "User fetched sucessfully.")
     );
 });
 
@@ -310,7 +316,7 @@ const updatePassword = asyncHandler(async (req, res) => {
 
     const passwordIsCorrect = await user.isPasswordCorrect(oldPassword);
 
-    console.log(passwordIsCorrect)
+    console.log(passwordIsCorrect);
     if (!passwordIsCorrect) {
         throw new ApiError(400, "Old Password is incorrect.");
     }
@@ -323,18 +329,17 @@ const updatePassword = asyncHandler(async (req, res) => {
     );
 });
 
-
 // Under Testing
-const fromIsLive=asyncHandler(async (req,res)=>{
+const fromIsLive = asyncHandler(async (req, res) => {
     // return req.user.formLive;
     res.status(200).json(
         new ApiResponse(
             200,
-            {fromLive:req.user.formLive},
+            { fromLive: req.user.formLive },
             "Check Live or not."
         )
-    )
-})
+    );
+});
 
 export {
     register,
