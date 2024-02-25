@@ -167,7 +167,7 @@ const getAllFromsId = asyncHandler(async (req, res) => {
     });
 
     console.log(formIds);
-    res.status(200).json(new ApiResponse(200, formIds?.forms, "All form ids"));
+    res.status(200).json(new ApiResponse(200, formIds?.forms || null, "All form ids"));
 });
 
 const formBasedOnId = asyncHandler(async (req, res) => {
@@ -207,7 +207,7 @@ const formBasedOnId = asyncHandler(async (req, res) => {
         );
     }
 
-    res.status(200).json(new ApiResponse(200, formData[0], "Your form Data"));
+    res.status(200).json(new ApiResponse(200, formData[0] || null, "Your form Data"));
 });
 
 //Api For form edit..
