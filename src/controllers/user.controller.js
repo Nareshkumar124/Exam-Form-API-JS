@@ -136,6 +136,7 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 
     const user = await User.findOne({ auid });
+    
 
     if (!user) {
         throw new ApiError(404, "User does not exist");
@@ -154,15 +155,51 @@ const loginUser = asyncHandler(async (req, res) => {
         httpOnly: true,
         secure: true,
     };
-    user.password = undefined;
+    
 
+    const user2 = await User.aggregate([
+        {
+            $match: {
+                _id:user._id
+            },
+        },
+        {
+            $lookup: {
+                from: "programs",
+                localField: "programId",
+                foreignField: "_id",
+                as: "course",
+            },
+        },
+        {
+            $lookup: {
+                from: "departments",
+                localField: "course.departmentId",
+                foreignField: "_id",
+                as: "department",
+            },
+        },
+
+        {
+            $addFields: {
+                "course": {
+                    $arrayElemAt: ["$course", 0],
+                },
+                "department": {
+                    $arrayElemAt: ["$department", 0],
+                },
+            },
+        },
+    ]);
+    user2[0].password = undefined;
+    // console.log(user2[0])
     res.status(200)
         .cookie("accessToken", accessToken, options)
         .cookie("refreshToken", refreshToken, options)
         .json(
             new ApiResponse(
                 200,
-                { user, accessToken, refreshToken },
+                { user:user2[0], accessToken, refreshToken },
                 "Login Successfully"
             )
         );
@@ -234,7 +271,7 @@ const getUser = asyncHandler(async (req, res) => {
             },
         },
     ]);
-
+    user[0].password = undefined;
     res.status(200).json(
         new ApiResponse(200, user[0], "User fetched sucessfully.")
     );
