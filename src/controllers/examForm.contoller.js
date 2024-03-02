@@ -29,6 +29,8 @@ const submitFromData = asyncHandler(async (req, res) => {
     } = req.body;
 
     console.log(req.body);
+
+    // return res.json(req.body)
     // all data come or not.
     if (
         [
