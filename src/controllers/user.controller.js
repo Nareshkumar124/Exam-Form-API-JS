@@ -151,11 +151,11 @@ const loginUser = asyncHandler(async (req, res) => {
     const { accessToken, refreshToken } =
         await generateAcessAndRefereshTokens(user);
 
-    const options = {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'None'
-    };
+    // const options = {
+    //     httpOnly: true,
+    //     secure: true,
+    //     sameSite: 'None'
+    // };
     
 
     const user2 = await User.aggregate([
@@ -195,8 +195,8 @@ const loginUser = asyncHandler(async (req, res) => {
     user2[0].password = undefined;
     // console.log(user2[0])
     res.status(200)
-        .cookie("accessToken", accessToken, options)
-        .cookie("refreshToken", refreshToken, options)
+        .cookie("accessToken", accessToken, {})
+        .cookie("refreshToken", refreshToken, {})
         .json(
             new ApiResponse(
                 200,
