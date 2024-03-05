@@ -6,6 +6,8 @@ import cookiePsrser from "cookie-parser";
 const app = express();
 
 
+
+
 //CORS
 app.use(
     cors({
