@@ -5,15 +5,6 @@ import cookiePsrser from "cookie-parser";
 
 const app = express();
 
-// app.set('trust proxy', function (ip, trustProxyFn) {
-//     if (ip === 'https://auts-examination.vercel.app') {
-//         return true; // trust this IP address
-//     }
-//     return false; // don't trust this IP address
-// });
-
-app.set('trust proxy', 'loopback');
-
 
 
 //CORS
