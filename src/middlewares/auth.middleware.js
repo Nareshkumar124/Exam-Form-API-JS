@@ -5,7 +5,7 @@ import { User } from "../models/user.models.js";
 
 
 const verifyJwt = asyncHandler(async function (req, res, next) {
-    const token = req.cookies?.accessToken;
+    const token = req.cookies?.__accessToken;
     if (!token) {
         throw new ApiError(401, "Unauthorizes request.");
     }

@@ -194,7 +194,7 @@ const loginUser = asyncHandler(async (req, res) => {
     user2[0].password = undefined;
     // console.log(user2[0])
     res.status(200)
-        .cookie("accessToken", accessToken, options)
+        .cookie("__accessToken", accessToken, options)
         // .cookie("refreshToken", refreshToken, options)
         .json(
             new ApiResponse(
