@@ -46,6 +46,6 @@ app.use("/api/v1/user",userRouter);
 app.use("/api/v1/department",departmentRouter)
 app.use("/api/v1/program",programRoute)
 app.use("/api/v1/form",examFormRouter)
-app.use("/api/v1/approved",adminRoute);
+app.use("/api/v1/admin",adminRoute);
 export { app };
 

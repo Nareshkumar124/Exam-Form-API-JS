@@ -9,7 +9,7 @@ adminRoute.use(verifyJwt)
 adminRoute.use(verifyAdmin)
 
 
-adminRoute.route("/").post(approvedByAdmin);
+adminRoute.route("/approved").post(approvedByAdmin);
 
 export {
     adminRoute,

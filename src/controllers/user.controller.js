@@ -164,6 +164,8 @@ const loginUser = asyncHandler(async (req, res) => {
 
     // Set the Set-Cookie header
     res.setHeader("Set-Cookie", cookieString);
+
+    
     // const options = {
     //     httpOnly: true,
     //     secure: true,

@@ -1,14 +1,16 @@
 import {asyncHandler} from '../utils/asyncHandler.js'
 import {ApiError} from '../utils/apiError.js'
 import {ApiResponse} from '../utils/apiResponse.js'
-import {FromData} from '../models/formData.models.js'
+import {FromData} from '../models/formData.models.js';
 
 
 // Under Testing
 const approvedByAdmin=asyncHandler(async (req,res)=>{
 
-    const {post,formId}=req.body;
+    let {post,formId,value}=req.body;
     const adminPostOption=["M","H","C"];
+
+    value=Number(value);
 
     if(!(adminPostOption.includes(post))){
         throw new ApiError(400,"Admin post is invalid.")
@@ -16,23 +18,23 @@ const approvedByAdmin=asyncHandler(async (req,res)=>{
 
     //Get form from database:
     const formData=await FromData.findById(formId);
-
+    
     if(!formData){
         throw new ApiError(500,"Form id is invalid");
     }
 
     if(post=="M"){
-        formData.approvedByMentor=true;
+        formData.approvedByMentor=value;
     }
     else if(post=="H"){
-        formData.approvedByHOD=true;
+        formData.approvedByHOD=value;
     }
 
     else if(post=="C"){
-        formData.approvedByController=true
+        formData.approvedByController=value
     }
 
-    const updatedFrom=formData.save({new:true})
+    const updatedFrom=await formData.save({new:true})
 
     res.status(200).json(
         new ApiResponse(
