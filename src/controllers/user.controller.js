@@ -225,6 +225,7 @@ const logoutUser = asyncHandler(async (req, res) => {
         secure: true,
         sameSite: "none",
         maxAge: 2 * 24 * 60 * 60 * 1000,
+        domain:"http://127.0.0.1"
     };
 
     res.status(200)
