@@ -155,7 +155,7 @@ const loginUser = asyncHandler(async (req, res) => {
         `Secure`,
         `SameSite=None`,
         `Max-Age=${2 * 24 * 60 * 60}`,
-        `Partitioned=true`,
+        `Partitioned`,
         `Path=/`
     ];
 
