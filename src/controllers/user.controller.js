@@ -136,7 +136,6 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 
     const user = await User.findOne({ auid });
-    
 
     if (!user) {
         throw new ApiError(404, "User does not exist");
@@ -154,15 +153,14 @@ const loginUser = asyncHandler(async (req, res) => {
     const options = {
         httpOnly: true,
         secure: true,
-        sameSite: 'none',
-        maxAge: 2 * 24 * 60 * 60 * 1000
+        sameSite: "none",
+        maxAge: 2 * 24 * 60 * 60 * 1000,
     };
-    
 
     const user2 = await User.aggregate([
         {
             $match: {
-                _id:user._id
+                _id: user._id,
             },
         },
         {
@@ -184,10 +182,10 @@ const loginUser = asyncHandler(async (req, res) => {
 
         {
             $addFields: {
-                "course": {
+                course: {
                     $arrayElemAt: ["$course", 0],
                 },
-                "department": {
+                department: {
                     $arrayElemAt: ["$department", 0],
                 },
             },
@@ -201,7 +199,7 @@ const loginUser = asyncHandler(async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-                { user:user2[0], accessToken, refreshToken },
+                { user: user2[0], accessToken, refreshToken },
                 "Login Successfully"
             )
         );
@@ -225,8 +223,8 @@ const logoutUser = asyncHandler(async (req, res) => {
     const options = {
         httpOnly: true,
         secure: true,
-        sameSite: 'none',
-        maxAge: 2 * 24 * 60 * 60 * 1000
+        sameSite: "none",
+        maxAge: 2 * 24 * 60 * 60 * 1000,
     };
 
     res.status(200)
@@ -266,10 +264,10 @@ const getUser = asyncHandler(async (req, res) => {
 
         {
             $addFields: {
-                "course": {
+                course: {
                     $arrayElemAt: ["$course", 0],
                 },
-                "department": {
+                department: {
                     $arrayElemAt: ["$department", 0],
                 },
             },
@@ -312,7 +310,43 @@ const updateUser = asyncHandler(async (req, res) => {
 
     const updatedUser = await user.save();
 
-    res.status(200).json(new ApiResponse(200, updatedUser, "User is UpDate."));
+    const user2 = await User.aggregate([
+        {
+            $match: {
+                _id: user._id,
+            },
+        },
+        {
+            $lookup: {
+                from: "programs",
+                localField: "programId",
+                foreignField: "_id",
+                as: "course",
+            },
+        },
+        {
+            $lookup: {
+                from: "departments",
+                localField: "course.departmentId",
+                foreignField: "_id",
+                as: "department",
+            },
+        },
+
+        {
+            $addFields: {
+                course: {
+                    $arrayElemAt: ["$course", 0],
+                },
+                department: {
+                    $arrayElemAt: ["$department", 0],
+                },
+            },
+        },
+    ]);
+    user2[0].password = undefined;
+
+    res.status(200).json(new ApiResponse(200, user2[0], "User is UpDate."));
 });
 
 const updateAvatar = asyncHandler(async (req, res) => {
