@@ -5,6 +5,7 @@ import {
     getAllForms,
     getAllFromsId,
     submitFromData,
+    updateFormData,
 } from "../controllers/examForm.contoller.js";
 
 const examFormRouter = Router();
@@ -14,5 +15,6 @@ examFormRouter.route("/submit-form-data").post(submitFromData);
 examFormRouter.route("/all-forms").get(getAllForms);
 examFormRouter.route("/form-data/:_id").get(formBasedOnId);
 examFormRouter.route("/form-ids").get(getAllFromsId);
+examFormRouter.route("/update-from-data").post(updateFormData);
 
 export { examFormRouter };

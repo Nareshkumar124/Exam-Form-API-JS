@@ -213,6 +213,52 @@ const formBasedOnId = asyncHandler(async (req, res) => {
 });
 
 //Api For form edit..
-//API From APROVEL...
+const updateFormData=asyncHandler(async (req,res)=>{
+    const formId=req.body._id;
 
-export { submitFromData, getAllForms, formBasedOnId, getAllFromsId };
+    const formData=await FromData.findById(formId)
+
+    if(!formData){
+        throw new ApiError(
+            400,
+            "FormId is requried."
+        )
+    }
+
+    const {receiptNumber,fees,date}=req.body;
+
+    if([receiptNumber,fees,date].some((val)=>val?.trim()==="" || val===undefined)){
+        throw new ApiError(
+            400,
+            "receiptNumber,fees and date requried."
+        )
+    }
+
+    let subjectCode;
+    if(!formData.regular){
+        subjectCode=req.body.subjectCode;
+
+        if(!subjectCode){
+            throw new ApiError(
+                400,
+                "Subject Code is requried."
+            )
+        }
+    }
+
+    // Save all new Data
+    formData.receiptNumber=receiptNumber;
+    formData.fees=fees;
+    formData.date=date;
+    formData.subjectCode=subjectCode;
+
+    const newFromData=await formData.save({new:true})
+
+    res.status(200).json(new ApiResponse(
+        200,
+        newFromData,
+        "form data update successful"
+    ))
+})
+
+export { submitFromData, getAllForms, formBasedOnId, getAllFromsId ,updateFormData};
