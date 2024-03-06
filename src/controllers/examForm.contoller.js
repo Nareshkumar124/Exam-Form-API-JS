@@ -169,14 +169,14 @@ const getAllFromsId = asyncHandler(async (req, res) => {
     });
 
     console.log(formIds);
-    res.status(200).json(new ApiResponse(200, formIds?.forms || null, "All form ids"));
+    res.status(200).json(
+        new ApiResponse(200, formIds?.forms || null, "All form ids")
+    );
 });
 
-const formBasedOnId = asyncHandler(async (req, res) => {
-    const formId = req.params._id; // Corrected variable name to formId
-    if (!formId) {
-        throw new ApiError(400, "Form id is required.");
-    }
+const getFromDataBasedOnId = async function (formId) {
+
+
     const formData = await FromData.aggregate([
         {
             $match: {
@@ -202,63 +202,177 @@ const formBasedOnId = asyncHandler(async (req, res) => {
         },
     ]);
 
-    if (!formData) {
+    if (!formData[0]) {
         throw new ApiError(
             404,
             "Form not found. Please enter a valid form id."
         );
     }
 
-    res.status(200).json(new ApiResponse(200, formData[0] || null, "Your form Data"));
+    return formData[0];
+
+
+
+};
+
+const formBasedOnId = asyncHandler(async (req, res) => {
+    const formId = req.params._id; // Corrected variable name to formId
+    if (!formId) {
+        throw new ApiError(400, "Form id is required.");
+    }
+    const formData=await getFromDataBasedOnId(formId);
+
+    res.status(200).json(
+        new ApiResponse(200, formData, "Your form Data")
+    );
 });
 
 //Api For form edit..
-const updateFormData=asyncHandler(async (req,res)=>{
-    const formId=req.body._id;
+const updateFormData = asyncHandler(async (req, res) => {
+    const formId = req.body._id;
 
-    const formData=await FromData.findById(formId)
+    const formData = await FromData.findById(formId);
 
-    if(!formData){
-        throw new ApiError(
-            400,
-            "FormId is requried."
-        )
+    if (!formData) {
+        throw new ApiError(400, "FormId is requried.");
     }
 
-    const {receiptNumber,fees,date}=req.body;
+    const { receiptNumber, fees, date } = req.body;
 
-    if([receiptNumber,fees,date].some((val)=>val?.trim()==="" || val===undefined)){
-        throw new ApiError(
-            400,
-            "receiptNumber,fees and date requried."
+    if (
+        [receiptNumber, fees, date].some(
+            (val) => val?.trim() === "" || val === undefined
         )
+    ) {
+        throw new ApiError(400, "receiptNumber,fees and date requried.");
     }
 
     let subjectCode;
-    if(!formData.regular){
-        subjectCode=req.body.subjectCode;
+    if (!formData.regular) {
+        subjectCode = req.body.subjectCode;
 
-        if(!subjectCode){
-            throw new ApiError(
-                400,
-                "Subject Code is requried."
-            )
+        if (!subjectCode) {
+            throw new ApiError(400, "Subject Code is requried.");
         }
     }
 
     // Save all new Data
-    formData.receiptNumber=receiptNumber;
-    formData.fees=fees;
-    formData.date=date;
-    formData.subjectCode=subjectCode;
+    formData.receiptNumber = receiptNumber;
+    formData.fees = fees;
+    formData.date = date;
+    formData.subjectCode = subjectCode;
 
-    const newFromData=await formData.save({new:true})
+    const newFromData = await formData.save({ new: true });
 
-    res.status(200).json(new ApiResponse(
-        200,
-        newFromData,
-        "form data update successful"
-    ))
-})
 
-export { submitFromData, getAllForms, formBasedOnId, getAllFromsId ,updateFormData};
+    const newAllFormData=await getFromDataBasedOnId(formId)
+
+    res.status(200).json(
+        new ApiResponse(200, newAllFormData, "form data update successful")
+    );
+});
+
+const updatePrevYearDataUsingPrevYearDataId = async function (
+    prevYearDataId,
+    body
+) {
+    const prevYearData = await PrevYearData.findById(prevYearDataId);
+
+    let {
+        examination,
+        university,
+        session,
+        auid,
+        result,
+        marksMax,
+        marksObtained,
+        coursePassed,
+        qus1,
+        qus2,
+        qus3,
+    } = body;
+
+    qus1 = Number(qus1);
+    qus2 = Number(qus2);
+    qus3 = Number(qus3);
+
+    const valArray = [
+        examination,
+        university,
+        session,
+        auid,
+        result,
+        marksMax,
+        marksObtained,
+        coursePassed,
+        qus1,
+        qus2,
+        qus3,
+    ];
+    if (
+        valArray.some((val) =>
+            typeof val === "string"
+                ? val?.trim() === ""
+                : false || val === undefined
+        )
+    ) {
+        throw new ApiError(
+            400,
+            "examination,university,session,auid,result,marksMax,marksObtained,coursePassed,qus1,qus2 and qus3 is requried"
+        );
+    }
+
+    const dataObject = {
+        examination,
+        university,
+        session,
+        auid,
+        result,
+        marksMax,
+        marksObtained,
+        coursePassed,
+        qus1,
+        qus2,
+        qus3,
+    };
+
+    for (const key in dataObject) {
+        prevYearData[key] = dataObject[key];
+    }
+
+    const newPrevYearData = await prevYearData.save({ new: true });
+
+    return newPrevYearData;
+};
+
+const updatePrevYearData = asyncHandler(async (req, res) => {
+    const formId = req.body._id;
+
+    const formData = await FromData.findById(formId);
+
+    if (!formData) {
+        throw new ApiError(400, "FormId is requried.");
+    }
+
+    const prevYearDataId = formData.prevYearData;
+
+    const newPrevYearData = await updatePrevYearDataUsingPrevYearDataId(
+        prevYearDataId,
+        req.body
+    );
+
+    const newAllFormData=await getFromDataBasedOnId(formId)
+
+    res.json(new ApiResponse(200, newAllFormData, "PrevYearData is update"));
+});
+
+
+
+export {
+    submitFromData,
+    getAllForms,
+    formBasedOnId,
+    getAllFromsId,
+    updateFormData,
+    updatePrevYearData,
+};
