@@ -24,7 +24,6 @@ const generateAcessAndRefereshTokens = async (user) => {
     }
 };
 
-
 const register = asyncHandler(async (req, res) => {
     const {
         auid,
@@ -156,15 +155,16 @@ const loginUser = asyncHandler(async (req, res) => {
         `SameSite=None`,
         `Max-Age=${2 * 24 * 60 * 60}`,
         `Partitioned`,
-        `Path=/`
+        `Path=/`,
     ];
 
     // Concatenate the options to form the cookie string
-    const cookieString = `__accessToken=${accessToken}; ${cookieOptions.join("; ")}`;
+    const cookieString = `__accessToken=${accessToken}; ${cookieOptions.join(
+        "; "
+    )}`;
 
     // Set the Set-Cookie header
     res.setHeader("Set-Cookie", cookieString);
-
 
     const user2 = await User.aggregate([
         {
@@ -241,7 +241,6 @@ const logoutUser = asyncHandler(async (req, res) => {
         // .clearCookie("refreshToken", options)
         .json(new ApiResponse(200, null, "User Logout SucessFully"));
 });
-
 
 const getUser = asyncHandler(async (req, res) => {
     const userId = req.user?._id;
@@ -378,8 +377,44 @@ const updateAvatar = asyncHandler(async (req, res) => {
 
     await user.save();
 
+    const user2 = await User.aggregate([
+        {
+            $match: {
+                _id: user._id,
+            },
+        },
+        {
+            $lookup: {
+                from: "programs",
+                localField: "programId",
+                foreignField: "_id",
+                as: "course",
+            },
+        },
+        {
+            $lookup: {
+                from: "departments",
+                localField: "course.departmentId",
+                foreignField: "_id",
+                as: "department",
+            },
+        },
+
+        {
+            $addFields: {
+                course: {
+                    $arrayElemAt: ["$course", 0],
+                },
+                department: {
+                    $arrayElemAt: ["$department", 0],
+                },
+            },
+        },
+    ]);
+    user2[0].password = undefined;
+
     res.status(200).json(
-        new ApiResponse(200, user, "Image update sucessfully")
+        new ApiResponse(200, user2[0], "Image update sucessfully")
     );
 });
 
