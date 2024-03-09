@@ -248,7 +248,7 @@ const updateFormData = asyncHandler(async (req, res) => {
 
     if (
         [receiptNumber, fees, date].some(
-            (val) => val?.trim() === "" || val === undefined
+            (val) => val === undefined || val?.trim() === "" 
         )
     ) {
         throw new ApiError(400, "receiptNumber,fees and date requried.");
