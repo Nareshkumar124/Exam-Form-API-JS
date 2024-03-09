@@ -232,7 +232,7 @@ const updateFormData = asyncHandler(async (req, res) => {
     const formId = req.body._id;
 
     if (!formId) {
-        throw new ApiError(400, "FormId is requried.");
+        throw new ApiError(400, "Form id is requried.");
     }
 
     const formData = await FromData.findById(formId);
@@ -275,7 +275,7 @@ const updateFormData = asyncHandler(async (req, res) => {
     const newAllFormData=await getFromDataBasedOnId(formId)
 
     res.status(200).json(
-        new ApiResponse(200, newAllFormData, "form data update successful")
+        new ApiResponse(200, newAllFormData, "Form data update successful")
     );
 });
 
@@ -374,7 +374,7 @@ const updatePrevYearData = asyncHandler(async (req, res) => {
 
     const newAllFormData=await getFromDataBasedOnId(formId)
 
-    res.json(new ApiResponse(200, newAllFormData, "PrevYearData is update"));
+    res.status(200).json(new ApiResponse(200, newAllFormData, "PrevYearData is update"));
 });
 
 
