@@ -229,15 +229,25 @@ const logoutUser = asyncHandler(async (req, res) => {
         }
     );
 
-    const options = {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-        maxAge: 2 * 24 * 60 * 60 * 1000,
-    };
+    const cookieOptions = [
+        `HttpOnly`,
+        `Secure`,
+        `SameSite=None`,
+        `Max-Age=${2 * 24 * 60 * 60}`,
+        `Partitioned`,
+        `Path=/`,
+    ];
+
+    // Concatenate the options to form the cookie string
+    const cookieString = `__accessToken=; ${cookieOptions.join(
+        "; "
+    )}`;
+
+    // Set the Set-Cookie header
+    res.setHeader("Set-Cookie", cookieString);
 
     res.status(200)
-        .clearCookie("accessToken", options)
+        // .clearCookie("accessToken", options)
         // .clearCookie("refreshToken", options)
         .json(new ApiResponse(200, null, "User Logout SucessFully"));
 });
