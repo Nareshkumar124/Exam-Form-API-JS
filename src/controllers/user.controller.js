@@ -24,7 +24,7 @@ const generateAcessAndRefereshTokens = async (user) => {
     }
 };
 
-//uunder testing
+
 const register = asyncHandler(async (req, res) => {
     const {
         auid,
@@ -165,16 +165,7 @@ const loginUser = asyncHandler(async (req, res) => {
     // Set the Set-Cookie header
     res.setHeader("Set-Cookie", cookieString);
 
-    
-    // const options = {
-    //     httpOnly: true,
-    //     secure: true,
-    //     sameSite: "none",
-    //     maxAge: 2 * 24 * 60 * 60 * 1000,
-    //     partitioned: true
-    // };
 
-   
     const user2 = await User.aggregate([
         {
             $match: {
@@ -251,7 +242,7 @@ const logoutUser = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, null, "User Logout SucessFully"));
 });
 
-// Under testing
+
 const getUser = asyncHandler(async (req, res) => {
     const userId = req.user?._id;
 

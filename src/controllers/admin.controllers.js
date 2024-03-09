@@ -7,10 +7,17 @@ import {FromData} from '../models/formData.models.js';
 // Under Testing
 const approvedByAdmin=asyncHandler(async (req,res)=>{
 
-    let {post,formId,value}=req.body;
+    let {post,formId,status,message}=req.body;
     const adminPostOption=["M","H","C"];
 
-    value=Number(value);
+    if([post,formId,status].some((val)=> !val ||val.trim()==="")){
+        throw new ApiError(
+            400,
+            "post,formId and status is requried."
+        )
+    }
+
+    status=Number(status);
 
     if(!(adminPostOption.includes(post))){
         throw new ApiError(400,"Admin post is invalid.")
@@ -24,17 +31,57 @@ const approvedByAdmin=asyncHandler(async (req,res)=>{
     }
 
     if(post=="M"){
-        formData.approvedByMentor=value;
+        formData.approvedByMentor=status;
     }
     else if(post=="H"){
-        formData.approvedByHOD=value;
+        formData.approvedByHOD=status;
     }
 
     else if(post=="C"){
-        formData.approvedByController=value
+        formData.approvedByController=status;
+    }
+
+    if(message){
+        formData.message.push(message);
+    }
+    
+
+    // Work on isEditable 
+    // If any one rejct the from and set all those to normal
+    if(status==-1){
+        if(post=="M"){
+            formData.approvedByHOD=0;
+            formData.approvedByController=0;
+        }
+        else if(post=="H"){
+            formData.approvedByMentor=0;
+            formData.approvedByController=0;
+        }
+    
+        else if(post=="C"){
+            formData.approvedByHOD=0;
+            formData.approvedByMentor=0;
+        }
+    }
+
+
+    const approvedArray=[formData.approvedByController,formData.approvedByHOD,formData.approvedByMentor];
+    // console.log(approvedArray);
+
+    let edit=true
+    for(const i of approvedArray){
+        if(i===1){
+            formData.isEditable=false
+            edit=false
+        }
+    }
+
+    if(edit){
+        formData.isEditable=true
     }
 
     const updatedFrom=await formData.save({new:true})
+
 
     res.status(200).json(
         new ApiResponse(

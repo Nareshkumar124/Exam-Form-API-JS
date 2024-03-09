@@ -27,19 +27,22 @@ const fromDataSchema = new mongoose.Schema(
             
         },
         approvedByMentor: {
-            type: Boolean,
+            type: Number,
+            enum:[-1,0,1],
             required: true,
-            default: false,
+            default: 0,
         },
-        approvedByHOD: {
-            type: Boolean,
+        approvedByHOD:  {
+            type: Number,
+            enum:[-1,0,1],
             required: true,
-            default: false,
+            default: 0,
         },
-        approvedByController: {
-            type: Boolean,
+        approvedByController:  {
+            type: Number,
+            enum:[-1,0,1],
             required: true,
-            default: false,
+            default: 0,
         },
         isEditable:{
             type:Boolean,
@@ -49,6 +52,14 @@ const fromDataSchema = new mongoose.Schema(
         subjectCode:{
             type: String,
         },
+
+        message:{
+            type:[
+                {
+                    type:String
+                }
+            ]
+        }
     },
     {
         timestamps: true,
