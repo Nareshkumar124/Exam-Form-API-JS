@@ -231,10 +231,17 @@ const formBasedOnId = asyncHandler(async (req, res) => {
 const updateFormData = asyncHandler(async (req, res) => {
     const formId = req.body._id;
 
+    if (!formId) {
+        throw new ApiError(400, "FormId is requried.");
+    }
+
     const formData = await FromData.findById(formId);
 
-    if (!formData) {
-        throw new ApiError(400, "FormId is requried.");
+    if(!formData){
+        throw new ApiError(
+            400,
+            "From id is invalid."
+        )
     }
 
     const { receiptNumber, fees, date } = req.body;
@@ -348,10 +355,14 @@ const updatePrevYearDataUsingPrevYearDataId = async function (
 const updatePrevYearData = asyncHandler(async (req, res) => {
     const formId = req.body._id;
 
+    if (!formId) {
+        throw new ApiError(400, "FormId is requried.");
+    }
+
     const formData = await FromData.findById(formId);
 
     if (!formData) {
-        throw new ApiError(400, "FormId is requried.");
+        throw new ApiError(400, "From id is invalid.");
     }
 
     const prevYearDataId = formData.prevYearData;
