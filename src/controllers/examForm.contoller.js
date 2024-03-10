@@ -254,8 +254,8 @@ const updateFormData = asyncHandler(async (req, res) => {
         )
     }
 
-    const { receiptNumber, fees, date } = req.body;
-
+    let { receiptNumber, fees, date } = req.body;
+    fees=String(fees)
     if (
         [receiptNumber, fees, date].some(
             (val) => val === undefined || val?.trim() === "" 
