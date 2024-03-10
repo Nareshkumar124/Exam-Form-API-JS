@@ -124,6 +124,8 @@ const submitFromData = asyncHandler(async (req, res) => {
         data:req.body
     }).catch((error)=>console.log(error))
 
+
+    formEntryInDatabase.prevYearData=prevData;
     
     res.status(200).json(
         new ApiResponse(200, formEntryInDatabase, "From data is submit")
