@@ -10,6 +10,7 @@ import {
     isStrongPassword,
     isEmailValid,
 } from "../utils/check.js";
+import { sendEmail } from "../utils/sendEmail.js";
 
 const generateAcessAndRefereshTokens = async (user) => {
     try {
@@ -114,7 +115,19 @@ const register = asyncHandler(async (req, res) => {
         role: userType,
     });
 
+
+    
+
     if (user) {
+        sendEmail({
+            to:user.email,
+            subject:"User registation confirmation",
+            type:"register",
+            data:user
+        }).catch((error)=>{
+            console.log(error)
+        })
+
         res.status(200).json(
             new ApiResponse(
                 200,
@@ -322,7 +335,7 @@ const updateUser = asyncHandler(async (req, res) => {
     const user = req.user;
     user.fullName = fullName;
     user.phoneNumber = phoneNumber;
-    user.eamil = email;
+    user.email = email;
     user.fatherName = fatherName;
     (user.motherName = motherName), (user.address = address);
 

@@ -5,6 +5,7 @@ import { ExaminationFrom } from "../models/examinationForm.models.js";
 import { FromData } from "../models/formData.models.js";
 import { PrevYearData } from "../models/prevYearData.model.js";
 import { Types } from "mongoose";
+import { sendEmail } from "../utils/sendEmail.js";
 
 //Under testing......
 
@@ -115,6 +116,15 @@ const submitFromData = asyncHandler(async (req, res) => {
         userWithFrom.forms.push(formEntryInDatabase._id);
         await userWithFrom.save();
     }
+
+    sendEmail({
+        to:req.user.email,
+        subject:"Examination Form",
+        type:"formSubmit",
+        data:req.body
+    }).catch((error)=>console.log(error))
+
+    
     res.status(200).json(
         new ApiResponse(200, formEntryInDatabase, "From data is submit")
     );
