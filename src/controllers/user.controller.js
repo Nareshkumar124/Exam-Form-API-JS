@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
-import { uploadOnCloud } from "../utils/cloudinary.js";
+import { deleteFromCloud, uploadOnCloud } from "../utils/cloudinary.js";
 import { User } from "../models/user.models.js";
 import { Types } from "mongoose";
 import {
@@ -382,19 +382,21 @@ const updateUser = asyncHandler(async (req, res) => {
 
 const updateAvatar = asyncHandler(async (req, res) => {
     const imageLocalPath = req.file?.path;
+    const user = req.user;
 
     if (!imageLocalPath) {
         throw new ApiError(400, "Image is requried");
     }
 
     //TODO: DELETE OLD IMAGE FROM CLOUD
+    const prevAvatarUrl = user?.avatar
+    await deleteFromCloud(prevAvatarUrl);
+
     const cloudUrl = await uploadOnCloud(imageLocalPath);
 
     if (!cloudUrl) {
         throw new ApiError(500, "Internal Server error.");
     }
-
-    const user = req.user;
 
     user.avatar = cloudUrl.url;
 
