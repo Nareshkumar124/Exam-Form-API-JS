@@ -1,4 +1,5 @@
 export const DB_NAME = "examinationform";
+// er diagram: https://app.eraser.io/workspace/C78KHKatqWdX9XH984Wl?origin=share&elements=xuD_3xAsmZxcokXtpm7Ilg
 
 const emailType = {
     register: function (data) {

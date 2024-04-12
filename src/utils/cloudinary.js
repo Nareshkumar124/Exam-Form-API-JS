@@ -17,14 +17,29 @@ const uploadOnCloud = async (localFilePath) => {
 
         //file has been uploded successfully i thin he forget to unlink a file
         console.log("Upload file success fully", response.url);
-        fs.unlinkSync(localFilePath)
+        fs.unlinkSync(localFilePath);
         return response;
     } catch (error) {
-        console.log(error)
+        console.log(error);
         fs.unlinkSync(localFilePath); //remove file from system when upload fail
         return null;
     }
 };
 
+const deleteFromCloud = async (publicURL) => {
+    try {
+        
+        if (!publicURL) return null;
 
-export { uploadOnCloud };
+        const publicId = publicURL.match(/\/upload\/v\d+\/([^\/]+)\./)[0];
+        await cloudinary.uploader.destroy(publicId);
+
+        return true;
+
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+};
+
+export { uploadOnCloud, deleteFromCloud };
