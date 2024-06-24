@@ -58,7 +58,7 @@ const submitFromData = asyncHandler(async (req, res) => {
     ) {
         throw new ApiError(
             400,
-            "regular,receiptNumber,fees and date is requrird examination,university,session,auid,result,marksMax,marksObtained,coursePassed,qus1,qus2,qus3"
+            "regular,receiptNumber,fees and date is required examination,university,session,auid,result,marksMax,marksObtained,coursePassed,qus1,qus2,qus3"
         );
     }
     regular = Number(regular);
@@ -66,13 +66,13 @@ const submitFromData = asyncHandler(async (req, res) => {
     qus2 = Number(qus2);
     qus3 = Number(qus3);
 
-    //if user code regular then we requried subject code.
+    //if user code regular then we required subject code.
 
     let subjectCode = undefined;
     if (!regular) {
         subjectCode = req.body.subjectCode;
         if (!subjectCode) {
-            throw new ApiError(400, "Subject Code is requried.");
+            throw new ApiError(400, "Subject Code is required.");
         }
     }
 
@@ -111,22 +111,21 @@ const submitFromData = asyncHandler(async (req, res) => {
             forms: [formEntryInDatabase._id],
         });
     } else {
-        //TODO: if from is type reguler check they already fill or not.....
+        //TODO: if from is type regular check they already fill or not.....
 
         userWithFrom.forms.push(formEntryInDatabase._id);
         await userWithFrom.save();
     }
 
     sendEmail({
-        to:req.user.email,
-        subject:"Examination Form",
-        type:"formSubmit",
-        data:req.body
-    }).catch((error)=>console.log(error))
+        to: req.user.email,
+        subject: "Examination Form",
+        type: "formSubmit",
+        data: req.body,
+    }).catch((error) => console.log(error));
 
+    formEntryInDatabase.prevYearData = prevData;
 
-    formEntryInDatabase.prevYearData=prevData;
-    
     res.status(200).json(
         new ApiResponse(200, formEntryInDatabase, "From data is submit")
     );
@@ -169,11 +168,11 @@ const getAllForms = asyncHandler(async (req, res) => {
     ]);
 
     res.status(200).json(
-        new ApiResponse(200, allForms || null, "All forms Datas.")
+        new ApiResponse(200, allForms || null, "All forms Data.")
     );
 });
 
-const getAllFromsId = asyncHandler(async (req, res) => {
+const getAllFormsId = asyncHandler(async (req, res) => {
     const userId = req.user._id;
 
     const formIds = await ExaminationFrom.findOne({
@@ -187,8 +186,6 @@ const getAllFromsId = asyncHandler(async (req, res) => {
 });
 
 const getFromDataBasedOnId = async function (formId) {
-
-
     const formData = await FromData.aggregate([
         {
             $match: {
@@ -222,9 +219,6 @@ const getFromDataBasedOnId = async function (formId) {
     }
 
     return formData[0];
-
-
-
 };
 
 const formBasedOnId = asyncHandler(async (req, res) => {
@@ -232,11 +226,9 @@ const formBasedOnId = asyncHandler(async (req, res) => {
     if (!formId) {
         throw new ApiError(400, "Form id is required.");
     }
-    const formData=await getFromDataBasedOnId(formId);
+    const formData = await getFromDataBasedOnId(formId);
 
-    res.status(200).json(
-        new ApiResponse(200, formData, "Your form Data")
-    );
+    res.status(200).json(new ApiResponse(200, formData, "Your form Data"));
 });
 
 //Api For form edit..
@@ -244,26 +236,23 @@ const updateFormData = asyncHandler(async (req, res) => {
     const formId = req.body._id;
 
     if (!formId) {
-        throw new ApiError(400, "Form id is requried.");
+        throw new ApiError(400, "Form id is required.");
     }
 
     const formData = await FromData.findById(formId);
 
-    if(!formData){
-        throw new ApiError(
-            400,
-            "From id is invalid."
-        )
+    if (!formData) {
+        throw new ApiError(400, "From id is invalid.");
     }
 
     let { receiptNumber, fees, date } = req.body;
-    fees=String(fees)
+    fees = String(fees);
     if (
         [receiptNumber, fees, date].some(
-            (val) => val === undefined || val?.trim() === "" 
+            (val) => val === undefined || val?.trim() === ""
         )
     ) {
-        throw new ApiError(400, "receiptNumber,fees and date requried.");
+        throw new ApiError(400, "receiptNumber,fees and date required.");
     }
 
     let subjectCode;
@@ -271,7 +260,7 @@ const updateFormData = asyncHandler(async (req, res) => {
         subjectCode = req.body.subjectCode;
 
         if (!subjectCode) {
-            throw new ApiError(400, "Subject Code is requried.");
+            throw new ApiError(400, "Subject Code is required.");
         }
     }
 
@@ -283,8 +272,7 @@ const updateFormData = asyncHandler(async (req, res) => {
 
     const newFromData = await formData.save({ new: true });
 
-
-    const newAllFormData=await getFromDataBasedOnId(formId)
+    const newAllFormData = await getFromDataBasedOnId(formId);
 
     res.status(200).json(
         new ApiResponse(200, newAllFormData, "Form data update successful")
@@ -337,7 +325,7 @@ const updatePrevYearDataUsingPrevYearDataId = async function (
     ) {
         throw new ApiError(
             400,
-            "examination,university,session,auid,result,marksMax,marksObtained,coursePassed,qus1,qus2 and qus3 is requried"
+            "examination,university,session,auid,result,marksMax,marksObtained,coursePassed,qus1,qus2 and qus3 is required"
         );
     }
 
@@ -368,7 +356,7 @@ const updatePrevYearData = asyncHandler(async (req, res) => {
     const formId = req.body._id;
 
     if (!formId) {
-        throw new ApiError(400, "FormId is requried.");
+        throw new ApiError(400, "FormId is required.");
     }
 
     const formData = await FromData.findById(formId);
@@ -384,18 +372,18 @@ const updatePrevYearData = asyncHandler(async (req, res) => {
         req.body
     );
 
-    const newAllFormData=await getFromDataBasedOnId(formId)
+    const newAllFormData = await getFromDataBasedOnId(formId);
 
-    res.status(200).json(new ApiResponse(200, newAllFormData, "PrevYearData is update"));
+    res.status(200).json(
+        new ApiResponse(200, newAllFormData, "PrevYearData is update")
+    );
 });
-
-
 
 export {
     submitFromData,
     getAllForms,
     formBasedOnId,
-    getAllFromsId,
+    getAllFormsId as getAllFormsId,
     updateFormData,
     updatePrevYearData,
 };

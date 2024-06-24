@@ -12,7 +12,7 @@ import {
 } from "../utils/check.js";
 import { sendEmail } from "../utils/sendEmail.js";
 
-const generateAcessAndRefereshTokens = async (user) => {
+const generateAccessAndRefreshTokens = async (user) => {
     try {
         const accessToken = user.generateAccessToken();
         const refreshToken = user.generateRefreshToken();
@@ -21,7 +21,7 @@ const generateAcessAndRefereshTokens = async (user) => {
         return { accessToken, refreshToken };
     } catch (error) {
         console.log(error);
-        throw new ApiError(500, "Token genrating failed.");
+        throw new ApiError(500, "Token generating failed.");
     }
 };
 
@@ -43,13 +43,13 @@ const register = asyncHandler(async (req, res) => {
         //check program id.
         programId = req.body.programId;
         if (!programId) {
-            throw new ApiError(400, "Program id is requried.");
+            throw new ApiError(400, "Program id is required.");
         }
     } else {
         userType = "A";
     }
 
-    // If user wnat to register a admin.
+    // If user want to register a admin.
     // if user is admin than they able to create admin.
 
     if (
@@ -88,7 +88,7 @@ const register = asyncHandler(async (req, res) => {
     const existedUser = await User.findOne({ auid: auid });
 
     if (existedUser) {
-        throw new ApiError(400, "User already exites.");
+        throw new ApiError(400, "User already exits.");
     }
 
     let avatarCloud;
@@ -115,18 +115,15 @@ const register = asyncHandler(async (req, res) => {
         role: userType,
     });
 
-
-    
-
     if (user) {
         sendEmail({
-            to:user.email,
-            subject:"User registation confirmation",
-            type:"register",
-            data:user
-        }).catch((error)=>{
-            console.log(error)
-        })
+            to: user.email,
+            subject: "User registration confirmation",
+            type: "register",
+            data: user,
+        }).catch((error) => {
+            console.log(error);
+        });
 
         res.status(200).json(
             new ApiResponse(
@@ -144,7 +141,7 @@ const loginUser = asyncHandler(async (req, res) => {
     const { auid, password } = req.body;
 
     if (!(auid && password)) {
-        throw new ApiError(400, "auid and password is requried.");
+        throw new ApiError(400, "auid and password is required.");
     }
 
     const user = await User.findOne({ auid });
@@ -160,7 +157,7 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 
     const { accessToken, refreshToken } =
-        await generateAcessAndRefereshTokens(user);
+        await generateAccessAndRefreshTokens(user);
 
     const cookieOptions = [
         `HttpOnly`,
@@ -252,9 +249,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     ];
 
     // Concatenate the options to form the cookie string
-    const cookieString = `__accessToken=; ${cookieOptions.join(
-        "; "
-    )}`;
+    const cookieString = `__accessToken=; ${cookieOptions.join("; ")}`;
 
     // Set the Set-Cookie header
     res.setHeader("Set-Cookie", cookieString);
@@ -262,7 +257,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     res.status(200)
         // .clearCookie("accessToken", options)
         // .clearCookie("refreshToken", options)
-        .json(new ApiResponse(200, null, "User Logout SucessFully"));
+        .json(new ApiResponse(200, null, "User Logout SuccessFully"));
 });
 
 const getUser = asyncHandler(async (req, res) => {
@@ -306,7 +301,7 @@ const getUser = asyncHandler(async (req, res) => {
     ]);
     user[0].password = undefined;
     res.status(200).json(
-        new ApiResponse(200, user[0], "User fetched sucessfully.")
+        new ApiResponse(200, user[0], "User fetched successfully.")
     );
 });
 
@@ -320,7 +315,7 @@ const updateUser = asyncHandler(async (req, res) => {
     ) {
         throw new ApiError(
             400,
-            "fullName,phoneNumber,email,fatherName,motherName,address is requried."
+            "fullName,phoneNumber,email,fatherName,motherName,address is required."
         );
     }
 
@@ -385,11 +380,11 @@ const updateAvatar = asyncHandler(async (req, res) => {
     const user = req.user;
 
     if (!imageLocalPath) {
-        throw new ApiError(400, "Image is requried");
+        throw new ApiError(400, "Image is required");
     }
 
     //TODO: DELETE OLD IMAGE FROM CLOUD
-    const prevAvatarUrl = user?.avatar
+    const prevAvatarUrl = user?.avatar;
     await deleteFromCloud(prevAvatarUrl);
 
     const cloudUrl = await uploadOnCloud(imageLocalPath);
@@ -439,7 +434,7 @@ const updateAvatar = asyncHandler(async (req, res) => {
     user2[0].password = undefined;
 
     res.status(200).json(
-        new ApiResponse(200, user2[0], "Image update sucessfully")
+        new ApiResponse(200, user2[0], "Image update successfully")
     );
 });
 
@@ -447,7 +442,7 @@ const updatePassword = asyncHandler(async (req, res) => {
     const { oldPassword, newPassword } = req.body;
 
     if (!(oldPassword && newPassword)) {
-        throw new ApiError(400, "oldpassword and newpassword is requried");
+        throw new ApiError(400, "oldpassword and newpassword is required");
     }
 
     const strongPassword = isStrongPassword(newPassword);
@@ -469,7 +464,7 @@ const updatePassword = asyncHandler(async (req, res) => {
     await user.save();
 
     res.status(200).json(
-        new ApiResponse(200, null, "Password change sucessfully.")
+        new ApiResponse(200, null, "Password change successfully.")
     );
 });
 
