@@ -3,6 +3,7 @@ import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { FromData } from "../models/formData.models.js";
 import mongoose from "mongoose";
+import { Admin } from "../models/admin.models.js";
 
 // Under Testing
 const approvedByAdmin = asyncHandler(async (req, res) => {
@@ -184,4 +185,88 @@ const formBasedOnUserId = asyncHandler(async function (req, res) {
     res.status(200).json(new ApiResponse(200, data, "User form data"));
 });
 
-export { approvedByAdmin, getFormsByClassId, formBasedOnUserId };
+//Test
+const register = asyncHandler(async (req, res) => {
+    const { auid, fullName, password, phoneNumber, email, role } = req.body;
+
+    try {
+        // Check if admin already exists
+        const existingAdmin = await Admin.findOne({ auid });
+        if (existingAdmin) {
+            throw new ApiError(400, "Admin with this AUID already exists.");
+        }
+
+        // Create new admin
+        const newAdmin = new Admin({
+            auid,
+            fullName,
+            password,
+            phoneNumber,
+            email,
+            role: role || "N", // Default role is 'N'
+        });
+
+        // Save admin to database
+        await newAdmin.save();
+
+        res.status(201).json(
+            new ApiResponse(201, "Admin registered successfully.")
+        );
+    } catch (error) {
+        console.error("Error during admin registration:", error);
+        throw new ApiError(500, "Error during admin registration:");
+    }
+});
+
+const login = asyncHandler(async (req, res) => {
+    const { auid, password } = req.body;
+
+    try {
+        // Find admin by AUID
+        const admin = await Admin.findOne({ auid });
+        if (!admin) {
+            return new ApiError(404, "Admin not found");
+        }
+
+        // Check if password is correct
+        const isPasswordCorrect = await admin.isPasswordCorrect(password);
+        if (!isPasswordCorrect) {
+            return new ApiError(401, "Invalid credentials.");
+        }
+
+        // Generate JWT access token
+        const accessToken = admin.generateAccessToken();
+
+        const option = {
+            httpOnly: true,
+            secure: true,
+            maxAge: 2 * 24 * 60 * 60,
+            sameSite: "none",
+            sameParty: true,
+        };
+        // // Optional: Generate refresh token
+        // const refreshToken = admin.generateRefreshToken
+        //     ? admin.generateRefreshToken()
+        //     : null;
+
+        // Respond with tokens
+        res.status(200)
+            .json({
+                message: "Login successful.",
+                accessToken,
+                refreshToken, // Include if refresh tokens are used
+            })
+            .cookies("____accessToken", accessToken, option);
+    } catch (error) {
+        console.error("Error during admin login:", error);
+        res.status(500).json({ message: "Server error." });
+    }
+});
+
+export {
+    approvedByAdmin,
+    getFormsByClassId,
+    formBasedOnUserId,
+    register,
+    login,
+};
